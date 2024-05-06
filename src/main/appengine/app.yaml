@@ -1,0 +1,2 @@
+runtime: java11
+entrypoint: 'java -jar com.example.negroid-connection-all.jar'
