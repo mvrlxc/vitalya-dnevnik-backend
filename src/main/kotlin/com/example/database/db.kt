@@ -17,7 +17,7 @@ object DB {
         transaction {
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create(Polsovateli, Comments, Schedule)
+            SchemaUtils.create(UsersBobi, Comments, Schedule, Users)
         }
     }
 

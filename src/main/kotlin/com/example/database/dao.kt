@@ -1,5 +1,6 @@
 package com.example.database
 
+import com.example.schedule.CommentsList
 import com.example.schedule.ScheduleFull
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -14,12 +15,12 @@ object DAO {
     ): String {
         var userToken = ""
         transaction {
-            userToken = Polsovateli.insert {
+            userToken = UsersBobi.insert {
                 it[username] = userUsername
                 it[login] = userLogin
                 it[password] = userPassword
                 it[token] = UUID.randomUUID().toString()
-            } get Polsovateli.token
+            } get UsersBobi.token
         }
         return userToken
     }
@@ -27,7 +28,7 @@ object DAO {
     fun isLoginFree(userLogin: String): Boolean {
         var a = -1
         transaction {
-            Polsovateli.select(Polsovateli.id).where { Polsovateli.login.eq(userLogin) }.forEach { a = it[Polsovateli.id] }
+            UsersBobi.select(UsersBobi.id).where { UsersBobi.login.eq(userLogin) }.forEach { a = it[UsersBobi.id] }
         }
         return a == -1
     }
@@ -38,8 +39,8 @@ object DAO {
     ): String {
         var userToken = ""
         transaction {
-            Polsovateli.select(Polsovateli.token).where { Polsovateli.login.eq(userLogin).and { Polsovateli.password.eq(userPassword) } }
-                .forEach { userToken = it[Polsovateli.token] }
+            UsersBobi.select(UsersBobi.token).where { UsersBobi.login.eq(userLogin).and { UsersBobi.password.eq(userPassword) } }
+                .forEach { userToken = it[UsersBobi.token] }
         }
         return userToken
     }
@@ -47,50 +48,10 @@ object DAO {
     fun getUsername(token: String): String {
         var usernameX: String = ""
         transaction {
-            Polsovateli.select(Polsovateli.username).where { Polsovateli.token.eq(token) }.forEach { usernameX = it[Polsovateli.username] }
+            UsersBobi.select(UsersBobi.username).where { UsersBobi.token.eq(token) }.forEach { usernameX = it[UsersBobi.username] }
         }
         return usernameX
     }
-
-    fun insert() {
-        transaction {
-            Schedule.insert {
-                it[group] = "PI06"
-                it[timeStart] = "8:30"
-                it[timeEnd] = "10:00"
-                it[name] = "vishmat"
-                it[type] = "praktik"
-                it[place] = "3 korp - 404"
-                it[teacher] = "mochalina"
-                it[date] = "25.04.2024"
-                it[pairNumber] = 3
-            }
-            Schedule.insert {
-                it[group] = "PI06"
-                it[timeStart] = "10:10"
-                it[timeEnd] = "11:40"
-                it[name] = "jopa penis chlen"
-                it[type] = "lekcia"
-                it[place] = "2 korp - 228"
-                it[teacher] = "negroid"
-                it[date] = "25.04.2024"
-                it[pairNumber] = 4
-            }
-            Schedule.insert {
-                it[group] = "PI06"
-                it[timeStart] = "9:30"
-                it[timeEnd] = "10:10"
-                it[name] = "neeagr"
-                it[type] = "praktic"
-                it[place] = "3korp - 322"
-                it[teacher] = "pidoras"
-                it[date] = "26.04.2024"
-                it[pairNumber] = 1
-            }
-        }
-    }
-
-
 
     fun getAllDates(): List<String> {
         val list: MutableList<String> = mutableListOf()
@@ -116,12 +77,43 @@ object DAO {
                         teacher = it[Schedule.teacher],
                         pairNumber = it[Schedule.pairNumber],
                         date = it[Schedule.date],
-                        group = it[Schedule.group]
+                        group = it[Schedule.group],
+                        homework = it[Schedule.homework] ?: "null"
                     )
                 )
             }
         }
         return schedule
+    }
+
+    fun getComments(lessonId: Int): MutableList<CommentsList> {
+        val comments: MutableList<CommentsList> = mutableListOf()
+        transaction {
+            Comments.selectAll().where { Comments.lessonId.eq(lessonId) }.forEach {
+                comments.add(
+                    CommentsList(
+                        username = it[Comments.username],
+                        lessonID = it[Comments.lessonId],
+                        content = it[Comments.content] ?: "null",
+                        sendingDateTime = it[Comments.sendingDateTime]
+                    )
+                )
+            }
+        }
+        return comments
+    }
+
+    fun addComment(token: String, lessonIDX: Int, contentX: String, sendingDateTimeX: String) {
+        val usernameX = getUsername(token)
+        transaction {
+            Comments.insert {
+                it[lessonId] = lessonIDX
+                it[username] = usernameX
+                it[content] = contentX
+                it[sendingDateTime] = sendingDateTimeX
+
+            }
+        }
     }
 
 

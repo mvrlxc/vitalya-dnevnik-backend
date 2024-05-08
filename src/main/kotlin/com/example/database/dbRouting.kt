@@ -2,6 +2,7 @@ package com.example.database
 
 import com.example.Admin
 import com.example.models.Text
+import com.example.schedule.CommentsList
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -40,15 +41,47 @@ fun Application.configureDbRouting() {
             }
         }
 
-        get("/test") {
-            val a = DAO.insert()
-            call.respond(a)
-        }
-
-        get("/negr"){
+        get("/negr") {
             val a = DAO.getAllDates()
             call.respond(a)
         }
 
+        post("/getComments") {
+            val id = call.receive(Text::class)
+            try {
+
+
+                val a = DAO.getComments(id.text.toInt())
+                call.respond(a)
+            } catch (e: Exception) {
+                call.respond(Text("$e"))
+            }
+        }
+
+        post("/createComment") {
+            val comment = call.receive<CommentsListADD>()
+            try {
+                DAO.addComment(
+                    token = comment.token,
+                    lessonIDX = comment.lessonID,
+                    contentX = comment.content,
+                    sendingDateTimeX = comment.sendingDateTime
+                )
+                call.respond(Text("success"))
+            } catch (e: Exception) {
+                call.respond(Text("error"))
+            }
+        }
+
     }
 }
+
+@Serializable
+data class CommentsListADD(
+    val lessonID: Int,
+    val token: String,
+    val content: String,
+    val sendingDateTime: String,
+)
+
+

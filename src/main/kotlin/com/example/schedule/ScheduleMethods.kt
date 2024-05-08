@@ -25,5 +25,14 @@ data class ScheduleFull(
     val teacher: String,
     val date: String,
     val pairNumber: Int,
+    val homework: String,
+)
+
+@Serializable
+data class CommentsList(
+    val lessonID: Int,
+    val username: String,
+    val content: String,
+    val sendingDateTime: String,
 )
 

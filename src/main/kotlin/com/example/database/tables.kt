@@ -4,24 +4,34 @@ package com.example.database
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
-object Polsovateli : Table() {
+object UsersBobi : Table() {
     val id: Column<Int> = integer("id").autoIncrement()
-    val username: Column<String> = varchar("imya", length = 24)
-    val login: Column<String> = varchar("lagin", length = 24)
-    val password: Column<String> = varchar("parol", length = 24)
+    val username: Column<String> = varchar("username", length = 24)
+    val login: Column<String> = varchar("login", length = 24)
+    val password: Column<String> = varchar("password", length = 24)
     val token: Column<String> = varchar("token", length = 64)
 
-    override val primaryKey = PrimaryKey(id, name = "PK_ID") // name is optional here
+    override val primaryKey = PrimaryKey(id) // name is optional here
+}
+
+object Users : Table() {
+    val id: Column<Int> = integer("id").autoIncrement()
+    val username: Column<String> = varchar("username", length = 24)
+    val login: Column<String> = varchar("login", length = 24)
+    val password: Column<String> = varchar("password", length = 24)
+    val token: Column<String> = varchar("token", length = 64)
+
+    override val primaryKey = PrimaryKey(id) // name is optional here
 }
 
 object Comments : Table() {
     val id: Column<Int> = integer("id").autoIncrement()
-    val userToken: Column<String> = (varchar("user_token", length = 64))
-    val ScheduleId: Column<Int> = (integer("schedule_id"))
+    val lessonId: Column<Int> = (integer("lesson_id"))
+    val username: Column<String> = (varchar("username", length = 64))
     val content: Column<String?> = varchar("content", length = 2000).nullable()
-    val progress: Column<String?> = varchar("progress", length = 16).nullable()
+    val sendingDateTime: Column<String> = varchar("sending_date", length = 64)
 
-    override val primaryKey = PrimaryKey(id, name = "PK_Comments_ID")
+    override val primaryKey = PrimaryKey(id)
 }
 
 object Schedule : Table() {
@@ -35,6 +45,7 @@ object Schedule : Table() {
     val teacher: Column<String> = varchar("teacher", length = 100)
     val date: Column<String> = varchar("date", length = 50)
     val pairNumber: Column<Int> = integer("pair_number")
+    val homework: Column<String?> = varchar("homework", length = 2000).nullable()
 
-    override val primaryKey = PrimaryKey(id, name = "PK_Schedule_ID")
+    override val primaryKey = PrimaryKey(id)
 }
